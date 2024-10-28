@@ -21,7 +21,7 @@ jobs:
       - name: Check each IP and collect geolocation
         id: check_ip
         run: |
-          echo "IP Address (Country Code)" > geolocation.txt
+          echo "IP Address (Proxy IP) (Country) (ASN Organization)" > geolocation.txt
           while IFS= read -r ip; do
             echo "Checking IP: $ip"
             response=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
@@ -29,13 +29,15 @@ jobs:
 
             # Memeriksa apakah respons valid JSON
             if echo "$response" | jq . >/dev/null 2>&1; then
-              proxyip=$(echo $response | jq -r '.proxyip')
-              echo "$ip ($proxyip)" >> geolocation.txt
+              proxyip=$(echo "$response" | jq -r '.proxyip')
+              country=$(echo "$response" | jq -r '.country')
+              asOrganization=$(echo "$response" | jq -r '.asOrganization')
+              echo "$ip (Proxy: $proxyip) ($country) ($asOrganization)" >> geolocation.txt
             else
               echo "$ip (Invalid response or not found)" >> geolocation.txt
             fi
 
-            # Jeda selama 5 detik sebelum melanjutkan ke IP berikutnya
+            # Jeda selama 10 detik sebelum melanjutkan ke IP berikutnya
             sleep 10
           done < proxy.txt
 
