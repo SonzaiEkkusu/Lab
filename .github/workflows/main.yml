@@ -24,13 +24,13 @@ jobs:
           echo "IP Address (Country Code)" > geolocation.txt
           while IFS= read -r ip; do
             echo "Checking IP: $ip"
-            response=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://api.ip.sb/geoip/$ip")
+            response=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
             echo "Response: $response"  # Debug: Menampilkan respons dari API
 
             # Memeriksa apakah respons valid JSON
             if echo "$response" | jq . >/dev/null 2>&1; then
-              country_code=$(echo $response | jq -r '.country_code')
-              echo "$ip ($country_code)" >> geolocation.txt
+              proxyip=$(echo $response | jq -r '.proxyip')
+              echo "$ip ($proxyip)" >> geolocation.txt
             else
               echo "$ip (Invalid response or not found)" >> geolocation.txt
             fi
