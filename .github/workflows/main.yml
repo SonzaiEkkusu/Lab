@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Menggunakan versi terbaru dari checkout
 
     - name: Fetch Proxy List
       id: fetch_proxies
@@ -33,7 +33,7 @@ jobs:
         echo 'results'=$(jq -s '.' results.json) >> results.json
 
     - name: Upload Results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # Menggunakan versi terbaru dari upload-artifact
       with:
         name: check-results
         path: results.json
