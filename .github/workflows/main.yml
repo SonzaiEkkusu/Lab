@@ -25,8 +25,13 @@ jobs:
           while IFS= read -r ip; do
             echo "Checking IP: $ip"
             response=$(curl -s "https://api.ip.sb/geoip/$ip")
+            echo "Response: $response"  # Debug: Menampilkan respons dari API
             country_code=$(echo $response | jq -r '.country_code')
-            echo "$ip ($country_code)" >> geolocation.txt
+            if [[ $country_code == "null" ]]; then  # Memeriksa apakah country_code null
+              echo "$ip (Invalid IP or not found)" >> geolocation.txt
+            else
+              echo "$ip ($country_code)" >> geolocation.txt
+            fi
           done < proxy.txt
 
       - name: Upload geolocation artifact
