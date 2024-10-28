@@ -24,18 +24,26 @@ jobs:
         echo 'results=[]' > results.json
         while read -r ip; do
             response=$(curl -s "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
-            colo=$(echo "$response" | jq -r '.colocation // "unknown"') # Mengambil colo dari respons
-            result="{\"ip\":\"$ip\",\"colo\":\"$colo\",\"result\":$response}"
-            # Menghapus tanda koma sebelum menambahkan entri baru
+            # Simpan hasil ke results.json tanpa colo
+            result="{\"ip\":\"$ip\",\"result\":$response}"
+
+            # Menyimpan hasil ke results.json
             if [[ $(cat results.json | jq '. | length') -gt 0 ]]; then
-                echo "results+=,$result" >> results.json
+                echo ",$result" >> results.json
             else
-                echo "results+=$result" >> results.json
+                echo "$result" >> results.json
             fi
         done < proxy.txt
 
         # Menutup array JSON
         echo ']' >> results.json
+
+        # Membuat hasil JSON yang valid
+        mv results.json tmp.json
+        echo 'results=[' > results.json
+        cat tmp.json >> results.json
+        echo ']' >> results.json
+        rm tmp.json
 
     - name: Upload Results
       uses: actions/upload-artifact@v3  # Menggunakan versi terbaru dari upload-artifact
