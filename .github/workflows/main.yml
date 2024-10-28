@@ -24,14 +24,19 @@ jobs:
         echo 'results=[]' > results.json
         while read -r ip; do
             response=$(curl -s "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
-            # Simpan hasil ke results.json tanpa colo
-            result="{\"ip\":\"$ip\",\"result\":$response}"
+            # Validasi respons dan pastikan itu adalah JSON yang valid
+            if echo "$response" | jq -e . >/dev/null 2>&1; then
+                # Simpan hasil ke results.json tanpa colo
+                result="{\"ip\":\"$ip\",\"result\":$response}"
 
-            # Menyimpan hasil ke results.json
-            if [[ $(cat results.json | jq '. | length') -gt 0 ]]; then
-                echo ",$result" >> results.json
+                # Menyimpan hasil ke results.json
+                if [[ $(cat results.json | jq '. | length') -gt 0 ]]; then
+                    echo ",$result" >> results.json
+                else
+                    echo "$result" >> results.json
+                fi
             else
-                echo "$result" >> results.json
+                echo "Invalid response for IP $ip: $response"
             fi
         done < proxy.txt
 
