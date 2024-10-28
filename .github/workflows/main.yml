@@ -1,0 +1,39 @@
+name: Check Proxy IPs
+
+on:
+  workflow_dispatch: # Memungkinkan untuk menjalankan workflow secara manual
+  schedule:
+    - cron: '0 * * * *' # Menjalankan setiap jam
+
+jobs:
+  check_ips:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Fetch Proxy List
+      id: fetch_proxies
+      run: |
+        curl -s https://raw.githubusercontent.com/ymyuuu/IPDB/refs/heads/main/proxy.txt -o proxy.txt
+
+    - name: Check IPs
+      id: check_ips
+      run: |
+        echo 'results=[]' > results.json
+        while IFS=',' read -r ip proxyip; do
+          if [ "$proxyip" = "true" ]; then
+            response=$(curl -s "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
+            colo=$(echo "$response" | jq -r '.colocation // "unknown"') # Mengambil colo dari respons
+            result="{\"ip\":\"$ip\",\"colo\":\"$colo\",\"result\":$response}"
+            echo "results+=[$result]" >> results.json
+          fi
+        done < proxy.txt
+        echo 'results'=$(jq -s '.' results.json) >> results.json
+
+    - name: Upload Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: check-results
+        path: results.json
