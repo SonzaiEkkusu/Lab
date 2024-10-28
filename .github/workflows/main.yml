@@ -26,11 +26,16 @@ jobs:
             response=$(curl -s "https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip=$ip&host=speed.cloudflare.com&port=443&tls=true")
             colo=$(echo "$response" | jq -r '.colocation // "unknown"') # Mengambil colo dari respons
             result="{\"ip\":\"$ip\",\"colo\":\"$colo\",\"result\":$response}"
-            echo "results+=[$result]" >> results.json
+            # Menghapus tanda koma sebelum menambahkan entri baru
+            if [[ $(cat results.json | jq '. | length') -gt 0 ]]; then
+                echo "results+=,$result" >> results.json
+            else
+                echo "results+=$result" >> results.json
+            fi
         done < proxy.txt
 
-        # Menyimpan hasil dalam format JSON
-        echo 'results'=$(jq -s '.' results.json) >> results.json
+        # Menutup array JSON
+        echo ']' >> results.json
 
     - name: Upload Results
       uses: actions/upload-artifact@v3  # Menggunakan versi terbaru dari upload-artifact
