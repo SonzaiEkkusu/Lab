@@ -37,12 +37,17 @@ jobs:
               echo "$ip (Invalid response or not found)" >> geolocation.txt
             fi
 
-            # Jeda selama 10 detik sebelum melanjutkan ke IP berikutnya
-            sleep 10
+            # Jeda selama 2 detik sebelum melanjutkan ke IP berikutnya
+            sleep 2
           done < proxy.txt
 
-      - name: Upload geolocation artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: geolocation
-          path: geolocation.txt
+      - name: Upload geolocation file to repository
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add geolocation.txt
+          git commit -m "Update geolocation.txt with latest IP data"
+          git push
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token untuk autentikasi
