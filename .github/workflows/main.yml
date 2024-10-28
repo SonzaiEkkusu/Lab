@@ -24,13 +24,15 @@ jobs:
           echo "IP Address (Country Code)" > geolocation.txt
           while IFS= read -r ip; do
             echo "Checking IP: $ip"
-            response=$(curl -s "https://api.ip.sb/geoip/$ip")
+            response=$(curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" "https://api.ip.sb/geoip/$ip")
             echo "Response: $response"  # Debug: Menampilkan respons dari API
-            country_code=$(echo $response | jq -r '.country_code')
-            if [[ $country_code == "null" ]]; then  # Memeriksa apakah country_code null
-              echo "$ip (Invalid IP or not found)" >> geolocation.txt
-            else
+
+            # Memeriksa apakah respons valid JSON
+            if echo "$response" | jq . >/dev/null 2>&1; then
+              country_code=$(echo $response | jq -r '.country_code')
               echo "$ip ($country_code)" >> geolocation.txt
+            else
+              echo "$ip (Invalid response or not found)" >> geolocation.txt
             fi
           done < proxy.txt
 
