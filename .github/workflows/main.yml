@@ -35,8 +35,8 @@ jobs:
               echo "$ip (Invalid response or not found)" >> geolocation.txt
             fi
 
-            # Jeda selama 3 detik sebelum melanjutkan ke IP berikutnya
-            sleep 3
+            # Jeda selama 5 detik sebelum melanjutkan ke IP berikutnya
+            sleep 10
           done < proxy.txt
 
       - name: Upload geolocation artifact
