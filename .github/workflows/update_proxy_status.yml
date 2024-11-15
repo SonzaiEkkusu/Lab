@@ -1,0 +1,79 @@
+name: Update Proxy IP Status
+
+on:
+  schedule:
+    - cron: '0 0 * * *' 
+  workflow_dispatch: 
+
+jobs:
+  update-proxies:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: Update proxy status
+      env:
+        IP_FILE: 'ip.txt'
+        API_URL: 'https://apix.sonzaix.us.kg/?ip={ip}:{port}'
+      run: |
+        python -c "
+import requests
+import csv
+import shutil
+
+input_file = '${IP_FILE}'
+output_file = 'ip_updated.txt'
+api_url_template = '${API_URL}'
+
+alive_proxies = []
+
+with open(input_file, 'r') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        if len(row) < 2:
+            continue
+        ip = row[0].strip()
+        port = row[1].strip()
+        api_url = api_url_template.format(ip=ip, port=port)
+        try:
+            response = requests.get(api_url, timeout=10)
+            data = response.json()
+            status = data.get('proxyStatus', '').upper()
+            if status == '✅ ALIVE ✅':
+                alive_proxies.append(row)
+                print(f'{ip}:{port} is ALIVE')
+            else:
+                print(f'{ip}:{port} is DEAD')
+        except Exception as e:
+            print(f'Error checking {ip}:{port}: {e}')
+
+with open(output_file, 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerows(alive_proxies)
+
+shutil.move(output_file, input_file)
+        "
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git add ip.txt
+        if git diff --cached --exit-code; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update proxy IP status"
+          git push
+        fi
