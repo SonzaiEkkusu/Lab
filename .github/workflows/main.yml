@@ -1,9 +1,6 @@
 name: Check IP Addresses
 
 on:
-  push:
-    branches:
-      - main  # Atau branch lain yang Anda gunakan
   workflow_dispatch:  # Menambahkan trigger untuk menjalankan secara manual
 
 jobs:
