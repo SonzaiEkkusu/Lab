@@ -1,5 +1,4 @@
 103.168.146.169,20132,ID,PT Herza Digital Indonesia
-103.6.207.108,8080,ID,PT Pusat Media Indonesia
 103.133.223.50,2096,ID,Cloud Teknologi Nusantara
 147.139.243.188,587,ID,Alibaba
 172.232.239.151,587,ID,Akamai Connected Cloud
@@ -7,14 +6,12 @@
 38.60.171.111,587,ID,Kaopu Cloud
 43.133.145.156,53136,ID,Tencent cloud computing
 5.223.41.42,443,SG,Hetzner Online
-38.181.70.7,16240,SG,Eons Data Communications
 4.193.111.126,40809,SG,Microsoft Azure
 193.239.166.244,443,SG,First Server
 8.219.163.164,36261,SG,Alibaba
 8.222.220.81,25435,SG,Alibaba
 195.114.193.161,443,SG,Datacamp
 139.180.215.77,57878,SG,Vultr
-139.180.131.125,10005,SG,Vultr
 45.77.36.40,443,SG,Vultr
 166.88.35.141,443,MY,Evoxt Enterprise
 210.186.12.244,443,MY,TIME Fibre Optic
